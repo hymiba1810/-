@@ -1,0 +1,68 @@
+function formatInput(value) {
+      const num = parseNumber(value);
+      return num.toLocaleString("ko-KR");
+    }
+
+    function formatWon(value) {
+      const sign = value < 0 ? "-" : "";
+      return sign + Math.abs(value).toLocaleString("ko-KR") + "원";
+    }
+
+    function setNegativeClass(el, value) {
+      if (value < 0) el.classList.add("negative");
+      else el.classList.remove("negative");
+    }
+
+    function calculate() {
+      const M = parseNumber(inputs.m.value);
+      const A = parseNumber(inputs.a.value);
+      const B = parseNumber(inputs.b.value);
+      const F = parseNumber(inputs.f.value);
+
+      const Q = A - M;
+      const sixQ = Q * 6;
+      const W = B - M;
+      const eighteenW = W * 18;
+      const X = F + sixQ + eighteenW;
+
+      out.q.textContent = formatWon(Q);
+      out.q6.textContent = formatWon(sixQ);
+      out.w.textContent = formatWon(W);
+      out.w18.textContent = formatWon(eighteenW);
+      out.f.textContent = formatWon(F);
+      out.x.textContent = formatWon(X);
+
+      setNegativeClass(out.q, Q);
+      setNegativeClass(out.q6, sixQ);
+      setNegativeClass(out.w, W);
+      setNegativeClass(out.w18, eighteenW);
+      setNegativeClass(out.x, X);
+
+      out.formula.textContent =
+Q = A - M = ${formatWon(A)} - ${formatWon(M)} = ${formatWon(Q)}
+6Q = ${formatWon(Q)} × 6 = ${formatWon(sixQ)}
+
+W = B - M = ${formatWon(B)} - ${formatWon(M)} = ${formatWon(W)}
+18W = ${formatWon(W)} × 18 = ${formatWon(eighteenW)}
+
+X = F + 6Q + 18W
+  = ${formatWon(F)} + ${formatWon(sixQ)} + ${formatWon(eighteenW)}
+  = ${formatWon(X)};
+    }
+
+    ids.forEach(id => {
+      inputs[id].addEventListener("input", e => {
+        const cursorAtEnd = e.target.selectionStart === e.target.value.length;
+        e.target.value = formatInput(e.target.value);
+        if (cursorAtEnd) {
+          const len = e.target.value.length;
+          e.target.setSelectionRange(len, len);
+        }
+        calculate();
+      });
+    });
+
+    calculate();
+  </script>
+</body>
+</html>
