@@ -1,139 +1,195 @@
-[2026-05-24 오후 5:29] ㅎㅇ: <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>요금제 계산기</title>
-
+<title>모바일 플랜 TCO 계산기</title>
 <style>
-body{
-font-family:sans-serif;
-background:#f5f5f5;
-padding:30px;
-}
-
-.container{
-max-width:500px;
-margin:auto;
-background:white;
-padding:25px;
-border-radius:20px;
-box-shadow:0 5px 20px rgba(0,0,0,0.1);
-}
-
-h1{
-text-align:center;
-margin-bottom:25px;
-}
-
-label{
-display:block;
-margin-top:15px;
-font-weight:bold;
-}
-
-input{
-width:100%;
-padding:12px;
-margin-top:5px;
-border:1px solid #ddd;
-border-radius:10px;
-font-size:16px;
-}
-
-.result{
-margin-top:25px;
-padding:20px;
-background:#f0f7ff;
-border-radius:15px;
-}
-
-.result h2{
-margin:0;
-font-size:20px;
-}
-
-.big{
-font-size:32px;
-font-weight:bold;
-color:#2563eb;
-margin-top:10px;
-}
+body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;padding:24px}
+.wrap{max-width:900px;margin:auto}
+.card{background:white;border-radius:20px;padding:24px;margin-bottom:20px;box-shadow:0 5px 20px rgba(0,0,0,.08)}
+h1,h2{margin-top:0}
+.desc{color:#666;margin-bottom:24px}
+label{display:block;margin-top:18px;font-weight:bold}
+input,select{width:100%;box-sizing:border-box;padding:14px;margin-top:6px;border:1px solid #ddd;border-radius:12px;font-size:18px}
+.result{font-size:40px;font-weight:bold;color:#2563eb;margin:18px 0}
+.row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #eee;gap:20px}
+.row:last-child{border-bottom:none}
+.badge{display:inline-block;background:#eff6ff;color:#2563eb;padding:8px 14px;border-radius:999px;font-size:14px;font-weight:bold;margin-bottom:16px}
+.diffPlus{color:#dc2626}.diffMinus{color:#16a34a}
+.note{font-size:13px;color:#777;margin-top:10px}
+@media(max-width:700px){body{padding:14px}.result{font-size:32px}.row{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
 
 <body>
+<div class="wrap">
 
-<div class="container">
+<h1>모바일 플랜 TCO 계산기</h1>
+<div class="desc">통신사 유지조건 기준 총 부담금과 자급제 구매 기준 총 부담금을 비교 계산합니다.</div>
 
-<h1>약정 계산기</h1>
+<div class="card">
+<h2>통신사 유지조건 입력</h2>
 
 <label>M 기존 실제 납부 요금</label>
-<input type="number" id="m">
+<input id="m" type="number" value="45000">
 
-<label>A 1~6개월 유지 요금제</label>
-<input type="number" id="a">
+<label>A 1~6개월차 유지 요금제</label>
+<input id="a" type="number" value="79000">
 
-<label>B 7~24개월 유지 요금제</label>
-<input type="number" id="b">
+<label>B 7~24개월차 유지 요금제</label>
+<input id="b" type="number" value="43000">
 
 <label>F 할인된 기기할부 원금</label>
-<input type="number" id="f">
+<input id="f" type="number" value="120000">
 
-<div class="result">
-<h2>최종 결과 X</h2>
-
-<div class="big" id="result">
-0원
+<label>통신사 제휴카드 선할인 선택</label>
+<select id="carrierCardDiscount">
+  <option value="0">미적용</option>
+  <option value="240000">12개월 24만원 선할인</option>
+  <option value="480000">24개월 48만원 선할인</option>
+  <option value="720000">36개월 72만원 선할인</option>
+</select>
+<div class="note">제휴카드는 70만원 이상 사용조건부 적용 기준입니다.</div>
 </div>
 
-<p id="detail"></p>
+<div class="card">
+<h2>자급제 비교 입력</h2>
 
+<label>자급제 기기 구매금액</label>
+<input id="selfDevice" type="number" value="0">
+
+<label>자급제 제휴카드 선할인 선택</label>
+<select id="selfCardDiscount">
+  <option value="0">미적용</option>
+  <option value="240000">12개월 24만원 선할인</option>
+  <option value="480000">24개월 48만원 선할인</option>
+  <option value="720000">36개월 72만원 선할인</option>
+</select>
+<div class="note">제휴카드는 70만원 이상 사용조건부 적용 기준입니다.</div>
 </div>
+
+<div class="card">
+<div class="badge">통신사 유지조건 기준</div>
+<h2>예상 총 TCO</h2>
+<div class="result" id="carrierTotal">0원</div>
+
+<div class="row"><span>1~6개월차 유지요금제 차액</span><b id="q">0원</b></div>
+<div class="row"><span>1~6개월 요금차액 합산</span><b id="q6">0원</b></div>
+<div class="row"><span>7~24개월 유지요금제 차액</span><b id="w">0원</b></div>
+<div class="row"><span>7~24개월 요금차액 합산</span><b id="w18">0원</b></div>
+<div class="row"><span>할인 적용 기기 원금</span><b id="fv">0원</b></div>
+<div class="row"><span>통신사 제휴카드 선할인 금액</span><b id="carrierCardValue">0원</b></div>
+<div class="row"><span>선할인 적용 후 통신사 TCO</span><b id="carrierAfterDiscount">0원</b></div>
+</div>
+
+<div class="card">
+<div class="badge">자급제 기준</div>
+<h2>자급제 총 부담금</h2>
+<div class="result" id="selfTotal">0원</div>
+
+<div class="row"><span>자급제 기기 구매금액</span><b id="selfDeviceValue">0원</b></div>
+<div class="row"><span>무이자 24개월 월 기기 부담금</span><b id="selfMonthlyDevice">0원</b></div>
+<div class="row"><span>자급제 제휴카드 선할인 금액</span><b id="selfCardValue">0원</b></div>
+<div class="row"><span>선할인 적용 후 자급제 기기금액</span><b id="selfAfterDiscount">0원</b></div>
+<div class="row"><span>선할인 적용 후 무이자 24개월 월 부담금</span><b id="selfAfterMonthly">0원</b></div>
+
+<div class="note">자급제는 월 요금 제외, 기기 구매금액 기준으로 비교합니다.</div>
+</div>
+
+<div class="card">
+<div class="badge">최종 비교</div>
+<h2>통신사 유지조건 vs 자급제 차이</h2>
+<div class="result" id="diffResult">0원</div>
+<div id="diffText"></div>
+</div>
+
 </div>
 
 <script>
+function num(id){
+  return Number(document.getElementById(id).value) || 0;
+}
 
-const inputs=document.querySelectorAll("input");
+function won(n){
+  return Math.round(n).toLocaleString("ko-KR") + "원";
+}
 
-inputs.forEach(input=>{
-input.addEventListener("input",calculate);
+function calc(){
+  var M = num("m");
+  var A = num("a");
+  var B = num("b");
+  var F = num("f");
+
+  var Q = A - M;
+  var Q6 = Q * 6;
+  var W = B - M;
+  var W18 = W * 18;
+
+  var carrierCard = num("carrierCardDiscount");
+
+  var carrierBeforeDiscount = F + Q6 + W18;
+  var carrierAfterDiscount = carrierBeforeDiscount - carrierCard;
+  if(carrierAfterDiscount < 0) carrierAfterDiscount = 0;
+
+  document.getElementById("q").innerText = won(Q);
+  document.getElementById("q6").innerText = won(Q6);
+  document.getElementById("w").innerText = won(W);
+  document.getElementById("w18").innerText = won(W18);
+  document.getElementById("fv").innerText = won(F);
+  document.getElementById("carrierCardValue").innerText = won(carrierCard);
+  document.getElementById("carrierTotal").innerText = won(carrierAfterDiscount);
+  document.getElementById("carrierAfterDiscount").innerText = won(carrierAfterDiscount);
+
+  var selfDevice = num("selfDevice");
+  var selfCard = num("selfCardDiscount");
+
+  var selfMonthlyDevice = selfDevice / 24;
+  var selfAfterDiscount = selfDevice - selfCard;
+  if(selfAfterDiscount < 0) selfAfterDiscount = 0;
+
+  var selfAfterMonthly = selfAfterDiscount / 24;
+
+  document.getElementById("selfDeviceValue").innerText = won(selfDevice);
+  document.getElementById("selfMonthlyDevice").innerText = won(selfMonthlyDevice);
+  document.getElementById("selfCardValue").innerText = won(selfCard);
+  document.getElementById("selfAfterDiscount").innerText = won(selfAfterDiscount);
+  document.getElementById("selfAfterMonthly").innerText = won(selfAfterMonthly);
+  document.getElementById("selfTotal").innerText = won(selfAfterDiscount);
+
+  var diff = carrierAfterDiscount - selfAfterDiscount;
+  var diffEl = document.getElementById("diffResult");
+  var diffText = document.getElementById("diffText");
+
+  diffEl.innerText = won(Math.abs(diff));
+
+  if(diff > 0){
+    diffEl.className = "result diffPlus";
+    diffText.innerHTML = "통신사 유지조건 기준이 자급제보다 <b>" + won(Math.abs(diff)) + "</b> 더 부담됩니다.";
+  }else if(diff < 0){
+    diffEl.className = "result diffMinus";
+    diffText.innerHTML = "통신사 유지조건 기준이 자급제보다 <b>" + won(Math.abs(diff)) + "</b> 더 저렴합니다.";
+  }else{
+    diffEl.className = "result";
+    diffText.innerHTML = "두 방식의 총 부담금이 동일합니다.";
+  }
+}
+
+[
+"m",
+"a",
+"b",
+"f",
+"carrierCardDiscount",
+"selfDevice",
+"selfCardDiscount"
+].forEach(function(id){
+  document.getElementById(id).oninput = calc;
+  document.getElementById(id).onchange = calc;
 });
 
-function won(num){
-return Number(num).toLocaleString("ko-KR")+"원";
-}
-
-function calculate(){
-
-const M=Number(document.getElementById("m").value)||0;
-const A=Number(document.getElementById("a").value)||0;
-const B=Number(document.getElementById("b").value)||0;
-const F=Number(document.getElementById("f").value)||0;
-
-const Q=A-M;
-const sixQ=Q*6;
-
-const W=B-M;
-const eighteenW=W*18;
-
-const X=F+sixQ+eighteenW;
-
-document.getElementById("result").innerText=won(X);
-
-document.getElementById("detail").innerHTML=
-
-Q = ${won(Q)}<br>
-6Q = ${won(sixQ)}<br><br>
-
-W = ${won(W)}<br>
-18W = ${won(eighteenW)}<br><br>
-
-F = ${won(F)}
-;
-
-}
-
+calc();
 </script>
 
 </body>
+</html>
